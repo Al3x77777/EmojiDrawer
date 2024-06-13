@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji Drawer</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <label for="emojiInput">Enter An Emoji: </label>
+    <input type="text" id="emojiInput" placeholder="e.g., 😀">
+    <button onclick="startDrawing()">Draw!</button>
+
+    <canvas id="emojiCanvas"></canvas>
+
+    <script>
+        var emojiInput = document.getElementById('emojiInput');
+        var emojiCanvas = document.getElementById('emojiCanvas');
+        var context = emojiCanvas.getContext('2d');
+        var isDrawing = false;
+        var emojiToDraw = '';
+
+        emojiCanvas.width = window.innerWidth;
+        emojiCanvas.height = window.innerHeight;
+
+        emojiCanvas.addEventListener('mousedown', startDrawing);
+        emojiCanvas.addEventListener('mousemove', draw);
+        emojiCanvas.addEventListener('mouseup', stopDrawing);
+        emojiCanvas.addEventListener('touchstart', startDrawing);
+        emojiCanvas.addEventListener('touchmove', draw);
+        emojiCanvas.addEventListener('touchend', stopDrawing);
+
+        function startDrawing() {
+            emojiToDraw = emojiInput.value;
+            isDrawing = true;
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+
+            e.preventDefault();
+
+            var x = e.clientX || e.touches[0].clientX;
+            var y = e.clientY || e.touches[0].clientY;
+
+            context.font = '24px Arial';
+            context.fillText(emojiToDraw, x, y);
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+    </script>
+</body>
+</html>
