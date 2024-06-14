@@ -12,6 +12,7 @@
 
         canvas {
             display: block;
+            border: 1px solid #ccc;
         }
     </style>
 </head>
@@ -19,6 +20,10 @@
     <label for="emojiInput">Enter An Emoji: </label>
     <input type="text" id="emojiInput" placeholder="e.g., 😀">
     <button onclick="startDrawing()">Draw!</button>
+    <button onclick="eraseDrawing()">Erase!</button>
+    <button onclick="exportDrawing()">Export!</button>
+    <button onclick="importDrawing()">Import!</button>
+    <input type="file" id="fileInput" style="display:none;" accept="application/json">
 
     <canvas id="emojiCanvas"></canvas>
 
@@ -28,6 +33,7 @@
         var context = emojiCanvas.getContext('2d');
         var isDrawing = false;
         var emojiToDraw = '';
+        var drawingData = [];
 
         emojiCanvas.width = window.innerWidth;
         emojiCanvas.height = window.innerHeight;
@@ -39,9 +45,10 @@
         emojiCanvas.addEventListener('touchmove', draw);
         emojiCanvas.addEventListener('touchend', stopDrawing);
 
-        function startDrawing() {
+        function startDrawing(e) {
             emojiToDraw = emojiInput.value;
             isDrawing = true;
+            draw(e);
         }
 
         function draw(e) {
@@ -49,15 +56,48 @@
 
             e.preventDefault();
 
-            var x = e.clientX || e.touches[0].clientX;
-            var y = e.clientY || e.touches[0].clientY;
+            var rect = emojiCanvas.getBoundingClientRect();
+            var x = (e.clientX || e.touches[0].clientX) - rect.left;
+            var y = (e.clientY || e.touches[0].clientY) - rect.top;
 
             context.font = '24px Arial';
             context.fillText(emojiToDraw, x, y);
+            drawingData.push({ emoji: emojiToDraw, x: x, y: y });
         }
 
         function stopDrawing() {
             isDrawing = false;
+        }
+
+        function eraseDrawing() {
+            context.clearRect(0, 0, emojiCanvas.width, emojiCanvas.height);
+            drawingData = [];
+        }
+
+        function exportDrawing() {
+            var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(drawingData));
+            var link = document.createElement('a');
+            link.href = dataStr;
+            link.download = 'drawing.json';
+            link.click();
+        }
+
+        function importDrawing() {
+            var fileInput = document.getElementById('fileInput');
+            fileInput.click();
+            fileInput.onchange = function(e) {
+                var file = e.target.files[0];
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    drawingData = JSON.parse(event.target.result);
+                    context.clearRect(0, 0, emojiCanvas.width, emojiCanvas.height);
+                    drawingData.forEach(function(item) {
+                        context.font = '24px Arial';
+                        context.fillText(item.emoji, item.x, item.y);
+                    });
+                }
+                reader.readAsText(file);
+            }
         }
     </script>
 </body>
