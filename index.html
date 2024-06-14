@@ -19,7 +19,6 @@
     <label for="emojiInput">Enter An Emoji: </label>
     <input type="text" id="emojiInput" placeholder="e.g., 😀">
     <button onclick="draw()">Draw!</button>
-    <button onclick="eraseDrawing()">Erase!</button>
     <button onclick="importDrawing()">Import!</button>
     <button onclick="exportDrawing()">Export!</button>
     <input type="file" id="fileInput" style="display:none;" accept="application/json">
@@ -63,11 +62,6 @@
         }
 
         function stopDrawing() {
-        }
-
-        function eraseDrawing() {
-            context.clearRect(0, 0, emojiCanvas.width, emojiCanvas.height);
-            drawingData = [];
         }
 
         function exportDrawing() {
