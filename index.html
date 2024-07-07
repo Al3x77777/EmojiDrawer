@@ -13,12 +13,22 @@
         canvas {
             display: block;
         }
+
+        .controls {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            z-index: 1000;
+        }
+
+        #fontSizeInput {
+            width: 80px;
+        }
     </style>
 </head>
 <body>
-    <label for="emojiInput">Enter An Emoji: </label>
+    <label for="emojiInput">Enter Emoji Or Text: </label>
     <input type="text" id="emojiInput" placeholder="e.g., 😀">
-    <button onclick="draw()">Draw!</button>
     <button onclick="importDrawing()">Import!</button>
     <button onclick="exportDrawing()">Export!</button>
     <input type="file" id="fileInput" style="display:none;" accept="application/json">
@@ -27,6 +37,11 @@
 
     <canvas id="emojiCanvas"></canvas>
 
+    <div class="controls">
+        <label for="fontSizeInput">Font Size:</label>
+        <input type="number" id="fontSizeInput" min="1" value="24" oninput="updateFontSize(this.value)">
+    </div>
+
     <script>
         var emojiInput = document.getElementById('emojiInput');
         var emojiCanvas = document.getElementById('emojiCanvas');
@@ -34,6 +49,7 @@
         var drawingData = [];
         var bgColor = '#ffffff';
         var textColor = '#000000';
+        var fontSize = 24;
 
         emojiCanvas.width = window.innerWidth;
         emojiCanvas.height = window.innerHeight;
@@ -45,6 +61,10 @@
         emojiCanvas.addEventListener('touchmove', draw);
         emojiCanvas.addEventListener('touchend', stopDrawing);
 
+        emojiInput.addEventListener('input', function() {
+            draw();
+        });
+
         function startDrawing(e) {
             draw(e);
         }
@@ -55,10 +75,10 @@
             var x = (e.clientX || e.touches[0].clientX) - rect.left;
             var y = (e.clientY || e.touches[0].clientY) - rect.top;
 
-            context.font = '24px Arial';
+            context.font = fontSize + 'px Arial';
             context.fillStyle = textColor;
             context.fillText(emojiToDraw, x, y);
-            drawingData.push({ emoji: emojiToDraw, x: x, y: y, color: textColor });
+            drawingData.push({ emoji: emojiToDraw, x: x, y: y, color: textColor, size: fontSize });
         }
 
         function stopDrawing() {
@@ -69,12 +89,13 @@
 
             var data = {
                 drawings: drawingData,
-                bgColor: bgColor
+                bgColor: bgColor,
+                textColor: textColor
             };
             var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
             var link = document.createElement('a');
             link.href = dataStr;
-            link.download = 'drawing.json';
+            link.download = 'Drawing.json';
             link.click();
         }
 
@@ -88,6 +109,7 @@
                     var data = JSON.parse(event.target.result);
                     drawingData = data.drawings;
                     bgColor = data.bgColor || '#ffffff';
+                    textColor = data.textColor || '#000000';
                     redrawCanvas();
                 }
                 reader.readAsText(file);
@@ -95,25 +117,37 @@
         }
 
         function selectBackgroundColor() {
-            var color = prompt("Enter A Background Color! (e.g., #ffffff or 'white'):", bgColor);
-            if (color !== null) {
-                bgColor = color;
+            var colorInput = document.createElement('input');
+            colorInput.type = 'color';
+            colorInput.value = bgColor;
+            colorInput.addEventListener('input', function() {
+                bgColor = colorInput.value;
                 emojiCanvas.style.backgroundColor = bgColor;
-            }
+            });
+            colorInput.click();
         }
 
         function selectTextColor() {
-            var color = prompt("Enter A Text Color! (e.g., #000000 or 'black'):", textColor);
-            if (color !== null) {
-                textColor = color;
-            }
+            var colorInput = document.createElement('input');
+            colorInput.type = 'color';
+            colorInput.value = textColor;
+            colorInput.addEventListener('input', function() {
+                textColor = colorInput.value;
+                redrawCanvas();
+            });
+            colorInput.click();
+        }
+
+        function updateFontSize(size) {
+            fontSize = parseInt(size);
+            redrawCanvas();
         }
 
         function redrawCanvas() {
             context.clearRect(0, 0, emojiCanvas.width, emojiCanvas.height);
             emojiCanvas.style.backgroundColor = bgColor;
             drawingData.forEach(function(item) {
-                context.font = '24px Arial';
+                context.font = item.size + 'px Arial';
                 context.fillStyle = item.color;
                 context.fillText(item.emoji, item.x, item.y);
             });
