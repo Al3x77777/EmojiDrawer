@@ -5,4 +5,4 @@ Preview: [HERE!](https://al3x77777.github.io/EmojiDrawer)
 - Added Option To Enter Font Size.
 - Changed Select BG/Text Color Picker.
 - Removed "Draw!" Button. Now It Auto Apply.
-![IMG](https://github.com/Al3x77777/EmojiDrawer/assets/112645002/d94b5e2c-f60d-4584-b331-006c2ea24df8)
+![IMG](https://github.com/Al3x77777/EmojiDrawer/assets/112645002/142409a3-5ff7-4dba-83d0-899baf38c575)
