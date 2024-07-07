@@ -1,4 +1,4 @@
-# EmojiDrawer
+# Emoji Drawer
 Draw With Emoji Or Text And Select BG And Text Color! You Can Also Export And Import Your Drawings!
 Preview: [HERE!](https://al3x77777.github.io/EmojiDrawer)
 # Update (07.07.2024):
